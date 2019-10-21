@@ -28,6 +28,12 @@ int main() {
     assert(arr5[10] == 11);
     assert(arr1 == arr5);
 
-    std::cout << "Tests passed!" << std::endl;
-    return EXIT_SUCCESS;
+    try {
+        LinearAllocator bigAllocator{sizeof(int) * 1024 * 1024 * 1024 * 1024};
+    } catch (const std::invalid_argument &error_msg) {
+        std::cout << "Tests passed!" << std::endl;
+        return EXIT_SUCCESS;
+    }
+    std::cout << "Tests failed!" << std::endl;
+    return EXIT_FAILURE;
 }

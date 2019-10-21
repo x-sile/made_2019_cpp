@@ -17,6 +17,9 @@ LinearAllocator::LinearAllocator(size_t maxSize) {
     memory_left = maxSize;
     offset = 0;
     head_block_ptr = (char *) malloc(maxSize);
+    if (head_block_ptr == nullptr) {
+        throw std::invalid_argument("Not enough memory");
+    }
 }
 
 char *LinearAllocator::alloc(size_t size) {
