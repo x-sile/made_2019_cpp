@@ -1,7 +1,7 @@
 #include <iostream>
 #include "matrix.h"
 
-int& Matrix::Array::operator[](int col) const {
+int &Matrix::Array::operator[](size_t col) {
     if ((row >= matrix.nrows) || (row < 0)) {
         throw std::out_of_range("Row index is out of range");
     } else if ((col >= matrix.ncols) || (col < 0)) {
@@ -10,7 +10,16 @@ int& Matrix::Array::operator[](int col) const {
     return matrix.arr[row * sizeof(int) + col];
 }
 
-Matrix::Array Matrix::operator[](int row) const {
+const int &Matrix::Array::operator[](size_t col) const {
+    if ((row >= matrix.nrows) || (row < 0)) {
+        throw std::out_of_range("Row index is out of range");
+    } else if ((col >= matrix.ncols) || (col < 0)) {
+        throw std::out_of_range("Column index is out of range");
+    }
+    return matrix.arr[row * sizeof(int) + col];
+}
+
+Matrix::Array Matrix::operator[](size_t row) const {
     return Array{*this, row};
 };
 
@@ -30,7 +39,7 @@ bool Matrix::operator!=(const Matrix &other) const {
     return !(*this == other);
 }
 
-Matrix& Matrix::operator*=(int mult) {
+Matrix &Matrix::operator*=(int mult) {
     for (int i = 0; i < nrows * ncols; i++) {
         arr[i] *= mult;
     }

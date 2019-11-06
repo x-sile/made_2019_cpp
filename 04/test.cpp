@@ -29,6 +29,7 @@ int main() {
     const Matrix m4(2, 3);
     const Matrix m5(2, 3);
     assert(m4 == m5);
+    assert(m4[0][0] == 0);
 
     try {
         m1[1][10];
