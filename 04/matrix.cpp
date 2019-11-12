@@ -19,10 +19,6 @@ const int &Matrix::Array::operator[](size_t col) const {
     return matrix.arr[row * sizeof(int) + col];
 }
 
-Matrix::Array Matrix::operator[](size_t row) const {
-    return Array{*this, row};
-};
-
 bool Matrix::operator==(const Matrix &other) const {
     if (this == &other) {
         return true;

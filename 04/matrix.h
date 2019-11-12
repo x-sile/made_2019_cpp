@@ -22,8 +22,9 @@ public:
         const int &operator[](size_t col) const;
     };
     //
-
-    Array operator[](size_t row) const;
+    
+    Array operator[](size_t row) { return Array{*this, row}; };
+    const Array operator[](size_t row) const { return Array{*this, row}; };
     bool operator==(const Matrix &other) const;
     bool operator!=(const Matrix &other) const;
     Matrix &operator*=(int mult);
