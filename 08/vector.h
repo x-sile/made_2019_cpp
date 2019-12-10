@@ -15,17 +15,22 @@ public:
     using reverse_iterator = std::reverse_iterator<iterator>;
 
     vector() : data_(allocator_.allocate(INIT_CAPACITY_)), size_(0), capacity_(INIT_CAPACITY_) {
-        construct_(0, capacity_);
+        for (size_t i = 0; i < capacity_; i++) {
+            allocator_.construct(&data_[i], T());
+        }
     }
 
     explicit vector(size_type count) : data_(allocator_.allocate(count)), size_(0), capacity_(count) {
-        construct_(0, capacity_);
+        for (size_t i = 0; i < capacity_; i++) {
+            allocator_.construct(&data_[i], T());
+        }
     }
 
     vector(size_type count, const value_type &defaultValue)
             : data_(allocator_.allocate(count)), size_(count), capacity_(count) {
-        construct_(0, capacity_);
-        std::fill(data_, data_ + size_, defaultValue);
+        for (size_t i = 0; i < capacity_; i++) {
+            allocator_.construct(&data_[i], defaultValue);
+        }
     }
 
     vector(std::initializer_list<value_type> init) {
@@ -35,9 +40,8 @@ public:
         size_type count = end - current;
         data_ = allocator_.allocate(count);
         size_ = capacity_ = count;
-        construct_(0, capacity_);
         while (current != end) {
-            data_[i++] = *current++;
+            allocator_.construct(&data_[i++], *current++);
         }
     }
 
@@ -54,8 +58,9 @@ public:
         data_ = tmp;
         size_ = copied.size_;
         capacity_ = copied.capacity_;
-        construct_(0, capacity_);
-        std::copy(copied.data_, copied.data_ + size_, data_);
+        for (size_t i = 0; i < size_; i++) {
+            allocator_.construct(&data_[i], copied.data_[i]);
+        }
         return *this;
     }
 
@@ -139,10 +144,7 @@ public:
 
     void resize(size_type newSize, const value_type &defaultValue) {
         if (newSize != size_) {
-            reallocate_(newSize);
-            if (newSize > size_) {
-                std::fill(data_ + size_, data_ + newSize, defaultValue);
-            }
+            reallocate_(newSize, defaultValue);
         }
     }
 
@@ -171,22 +173,19 @@ private:
     static constexpr int SIZE_MULT_ = 2;
     static constexpr int INIT_CAPACITY_ = 8;
 
-    void reallocate_(size_type count) {
+    void reallocate_(size_type count, const value_type &defaultValue = T()) {
         pointer tmp = allocator_.allocate(count);
-        for (size_t i = 0; i < count; i++) {
-            allocator_.construct(&tmp[i], T());
-        }
         size_type newSize = std::min(size_, count);
-        std::copy(data_, data_ + newSize, tmp);
+        for (size_t i = 0; i < count; i++) {
+            if (i < newSize) {
+                allocator_.construct(&tmp[i], data_[i]);
+            } else {
+                allocator_.construct(&tmp[i], defaultValue);
+            }
+        }
         allocator_.deallocate(data_, capacity_);
         data_ = tmp;
         size_ = newSize;
         capacity_ = count;
-    }
-
-    void construct_(size_type from_, size_type to_) {
-        for (size_t i = from_; i < to_; i++) {
-            allocator_.construct(&data_[i], T());
-        }
     }
 };

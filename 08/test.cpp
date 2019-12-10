@@ -16,7 +16,7 @@ int main() {
     assert(vec3.size() == 5);
     assert(vec3.capacity() == 5);
 
-    vector<std::string> vec4{"1", "2", "3"};
+    vector<int> vec4{1, 2, 3};
     assert(vec4.size() == 3);
     assert(vec4.capacity() == 3);
 
