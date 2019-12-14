@@ -47,13 +47,16 @@ public:
 
     vector(const vector &copied)
             : data_(allocator_.allocate(copied.capacity_)), size_(copied.size_), capacity_(copied.capacity_) {
-        std::copy(copied.data_, copied.data_ + size_, data_);
+        for (size_t i = 0; i < size_; i++) {
+            allocator_.construct(&data_[i], copied.data_[i]);
+        }
     }
 
     vector &operator=(const vector &copied) {
         if (this == &copied)
             return *this;
         pointer tmp = allocator_.allocate(copied.capacity_);
+        clear();
         allocator_.deallocate(data_, capacity_);
         data_ = tmp;
         size_ = copied.size_;
@@ -74,6 +77,7 @@ public:
     vector &operator=(vector &&moved) {
         if (this == &moved)
             return *this;
+        clear();
         allocator_.deallocate(data_, capacity_);
         data_ = moved.data_;
         size_ = moved.size_;
@@ -123,7 +127,7 @@ public:
     }
 
     void pop_back() {
-        size_--;
+        allocator_.destroy(&data_[--size_]);
     }
 
     void reserve(size_type count) {
@@ -157,10 +161,14 @@ public:
     }
 
     void clear() noexcept {
+        for (size_type i = 0; i < size_; i++) {
+            allocator_.destroy(&data_[i]);
+        }
         size_ = 0;
     }
 
     ~vector() {
+        clear();
         allocator_.deallocate(data_, capacity_);
         data_ = nullptr;
     }
@@ -183,6 +191,7 @@ private:
                 allocator_.construct(&tmp[i], defaultValue);
             }
         }
+        clear();
         allocator_.deallocate(data_, capacity_);
         data_ = tmp;
         size_ = newSize;
